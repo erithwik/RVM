@@ -457,8 +457,8 @@ void ins(uint16_t instr)
 static void (*op_table[16])(uint16_t) = {
     ins<0>, ins<1>, ins<2>, ins<3>,
     ins<4>, ins<5>, ins<6>, ins<7>,
-    NULL, ins<9>, ins<10>, ins<11>,
-    ins<12>, NULL, ins<14>, ins<15>
+    ins<8>, ins<9>, ins<10>, ins<11>,
+    ins<12>, ins<13>, ins<14>, ins<15>
 };
 
 int main(int argc, const char* argv[]) {
