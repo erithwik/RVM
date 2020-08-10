@@ -22,8 +22,8 @@ uint16_t memory[UINT16_MAX]; // this is to have 65536 bytes of space
 
 enum
 {
-    MR_KBSR = 0xFE00, // keyboard status
-    MR_KBDR = 0xFE02  // keyboard data
+    keyboard_status = 0xFE00, // keyboard status
+    keyboard_data = 0xFE02  // keyboard data
 };
 
 // this is for checking the key (boilerplate code)
@@ -66,16 +66,16 @@ void handle_interrupt(int signal)
 // this is for reading the memory from the right location
 uint16_t mem_read(uint16_t address)
 {
-    if (address == MR_KBSR)
+    if (address == keyboard_status)
     {
         if (check_key())
         {
-            memory[MR_KBSR] = (1 << 15);
-            memory[MR_KBDR] = getchar();
+            memory[keyboard_status] = (1 << 15);
+            memory[keyboard_data] = getchar();
         }
         else
         {
-            memory[MR_KBSR] = 0;
+            memory[keyboard_status] = 0;
         }
     }
     return memory[address];
@@ -86,7 +86,7 @@ void mem_write(uint16_t address, uint16_t val)
     memory[address] = val;
 }
 
-uint16_t changeEndianness(uint16_t x)
+uint16_t change_endianness(uint16_t x)
 {
     return (x << 8) | (x >> 8);
 }
@@ -97,7 +97,7 @@ void read_image_file(FILE* file)
     uint16_t origin;
     // reading and convertin endian-ness
     fread(&origin, sizeof(origin), 1, file);
-    origin = changeEndianness(origin);
+    origin = change_endianness(origin);
     
     // single fread to get all the data
     uint16_t max_read = UINT16_MAX - origin;
@@ -107,13 +107,13 @@ void read_image_file(FILE* file)
     // for each, we are swapping to the endian-ness that we need.
     while (read-- > 0)
     {
-        *p = changeEndianness(*p);
+        *p = change_endianness(*p);
         ++p;
     }
 }
 
 // we use this function to actually read (we use traditional C here)
-int read_image(const char* image_path)
+int read_image_data(const char* image_path)
 {
     FILE* file = fopen(image_path, "rb");
     if (!file) { return 0; };
@@ -471,7 +471,7 @@ int main(int argc, const char* argv[]) {
 
     for (int j = 1; j < argc; ++j)
     {
-        if (!read_image(argv[j]))
+        if (!read_image_data(argv[j]))
         {
             printf("failed to load image: %s\n", argv[j]);
             exit(1);
